@@ -22,7 +22,15 @@ See `.env.example`. Never commit `.env`. Required: `DATABASE_URL`, `BETTER_AUTH_
 
 ## Test database
 
-Integration tests use `smartmess_test` on the same Postgres container (auto-created + `migrate deploy` in `beforeAll`). Never point them at the dev database. Rate limiting is disabled under `NODE_ENV=test` only.
+Integration suites use isolated databases on the same Postgres container (`smartmess_test_auth`, `smartmess_test_mess`; auto-created + `migrate deploy` in `beforeAll`). Never point them at the dev database. Rate limiting is disabled under `NODE_ENV=test` only.
+
+## Verification runbook (Phase 3)
+
+- Owner submits from `/owner/settings` (Draft/Rejected → Submitted). Withdrawing returns to Draft.
+- Admins review oldest-first at `/admin/verifications`: Submitted → Under review → Approved/Rejected (reason required); Approved → Suspended (reason required, unpublishes immediately); Suspended → Approved (reinstate, stays unpublished until owner republishes).
+- Every decision writes `mess_verification_event` (actor, from→to, reason, timestamp).
+- Publish toggle needs APPROVED. Only published + approved listings appear in `/discover`.
+- Suspended mess? Vanishes from discovery instantly; existing commitments are preserved by rule (enforced in Phase 5+ flows).
 
 ## Backups / recovery / monitoring
 

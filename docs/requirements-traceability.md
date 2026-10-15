@@ -6,7 +6,7 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 
 - REQ-C01 Registration/sign-in | P2 | better-auth email+password, `/sign-up`, `/sign-in`, `/verify-email`, `/forgot-password`, `/reset-password` | `tests/integration/auth-flow.test.ts` (10), `auth-access.test.ts` | Complete
 - REQ-C02 Profile + addresses | P2 | `/api/profile`, `/api/addresses*`, `/app/profile`, `/app/addresses`, per-role profiles | integration ownership/status tests, validation tests | Complete
-- REQ-C03 Discovery + profiles | P3 | — | — | Not Started
+- REQ-C03 Discovery + profiles | P3 | `/discover` (city search/filters), `/discover/[slug]` (eligible-only, 404 otherwise), no ratings (no review data) | integration filter/eligibility tests, dev sweep | Complete
 - REQ-C04 Menu/pricing visibility | P4 | — | — | Not Started
 - REQ-C05 One-time orders | P5 | — | — | Not Started
 - REQ-C06 Subscriptions + skip/pause/resume/history | P6 | — | — | Not Started
@@ -16,8 +16,8 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 
 ## Owner
 
-- REQ-O01 Onboarding + verification | P3 | — | — | Not Started
-- REQ-O02 Profile mgmt | P3 | — | — | Not Started
+- REQ-O01 Onboarding + verification | P3 | `/owner/messes/new`, `/owner/settings` editor, submit/withdraw/publish, `/admin/verifications` + decisions, `MessVerificationEvent` audit | `tests/integration/mess-lifecycle.test.ts` (lifecycle, audit, isolation) | Complete
+- REQ-O02 Profile mgmt | P3 | same as O01 (business profile, hours, areas, fulfillment) | same | Complete
 - REQ-O03 Menu + schedule mgmt | P4 | — | — | Not Started
 - REQ-O04 Per-slot order windows | P4 | — | — | Not Started
 - REQ-O05 Capacity limits | P4 | — | — | Not Started

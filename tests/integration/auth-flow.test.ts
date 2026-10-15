@@ -3,7 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 const DEV_URL = "postgresql://smartmess:smartmess_dev_pw@localhost:5432/smartmess?schema=public";
 const TEST_URL =
-  "postgresql://smartmess:smartmess_dev_pw@localhost:5432/smartmess_test?schema=public";
+  "postgresql://smartmess:smartmess_dev_pw@localhost:5432/smartmess_test_auth?schema=public";
 
 let db!: import("@prisma/client").PrismaClient;
 let auth!: (typeof import("@/lib/auth"))["auth"];
@@ -27,6 +27,9 @@ function postJson(path: string, body: unknown, cookie?: string) {
 }
 
 async function cleanDb() {
+  await db.messVerificationEvent.deleteMany();
+  await db.messStaff.deleteMany();
+  await db.mess.deleteMany();
   await db.address.deleteMany();
   await db.session.deleteMany();
   await db.account.deleteMany();
@@ -112,9 +115,9 @@ beforeAll(async () => {
   const admin = new pg.default.Client({ connectionString: DEV_URL });
   await admin.connect();
   await admin
-    .query("SELECT 1 FROM pg_database WHERE datname = 'smartmess_test'")
+    .query("SELECT 1 FROM pg_database WHERE datname = 'smartmess_test_auth'")
     .then(async (r: { rowCount: number | null }) => {
-      if ((r.rowCount ?? 0) === 0) await admin.query("CREATE DATABASE smartmess_test");
+      if ((r.rowCount ?? 0) === 0) await admin.query("CREATE DATABASE smartmess_test_auth");
     });
   await admin.end();
 
@@ -164,12 +167,14 @@ describe("signup roles and verification lifecycle", () => {
     expect(row.role).toBe("MESS_OWNER");
   }, 60000);
 
-  it("rejects MESS_STAFF and PLATFORM_ADMIN self-registration", async () => {
-    for (const role of ["MESS_STAFF", "PLATFORM_ADMIN"]) {
-      const res = await signupViaRoute(role, `${role.toLowerCase()}@example.com`);
-      expect(res.status).toBe(400);
-    }
-    expect(await db.user.count()).toBe(0);
+  it("rejects PLATFORM_ADMIN self-registration but allows staff", async () => {
+    const admin = await signupViaRoute("PLATFORM_ADMIN", "sneaky@example.com");
+    expect(admin.status).toBe(400);
+    const staff = await signupViaRoute("MESS_STAFF", "staffself@example.com");
+    expect(staff.status).toBe(200);
+    const row = await userByEmail("staffself@example.com");
+    expect(row.role).toBe("MESS_STAFF");
+    expect(await db.user.count()).toBe(1);
   }, 60000);
 
   it("verifies email, activates the account, and signs in with a session", async () => {

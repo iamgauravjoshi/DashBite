@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import {
   ROLE_HOME,
@@ -69,3 +70,22 @@ export function homeForRole(role: UserRole): string {
 }
 
 export { safeNextPath };
+
+export function apiError(code: string, status: number, details?: string[]) {
+  return NextResponse.json({ error: { code, ...(details ? { details } : {}) } }, { status });
+}
+
+/** API-layer gate: authenticated + usable + optional role allowlist. */
+export async function requireApiUser(
+  request: Request,
+  roles?: UserRole[]
+): Promise<{ user: SessionUser } | { response: NextResponse }> {
+  const user = await getSessionUser(request.headers);
+  if (!user) return { response: apiError("UNAUTHENTICATED", 401) };
+  if (user.banned || user.status === "SUSPENDED") return { response: apiError("SUSPENDED", 403) };
+  if (user.status === "INACTIVE") return { response: apiError("DEACTIVATED", 403) };
+  if (!user.emailVerified || user.status === "UNVERIFIED")
+    return { response: apiError("UNVERIFIED", 403) };
+  if (roles && !roles.includes(user.role)) return { response: apiError("FORBIDDEN", 403) };
+  return { user };
+}

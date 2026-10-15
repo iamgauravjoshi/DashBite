@@ -16,6 +16,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 const ROLE_COPY: Record<SignupRole, { title: string; hint: string }> = {
   CUSTOMER: { title: "Customer", hint: "Order meals, subscribe" },
   MESS_OWNER: { title: "Mess owner", hint: "List + run your kitchen" },
+  MESS_STAFF: { title: "Staff", hint: "Work a mess after they assign you" },
   DELIVERY_AGENT: { title: "Delivery", hint: "Fulfill assigned stops" }
 };
 
@@ -67,8 +68,7 @@ export function SignUpForm() {
       <CardHeader>
         <CardTitle>Create your account</CardTitle>
         <CardDescription>
-          Staff accounts are created by mess owners — public sign-up covers customers, owners, and
-          delivery partners.
+          Staff join on their own and start working once a mess owner assigns them.
         </CardDescription>
       </CardHeader>
       <CardContent>

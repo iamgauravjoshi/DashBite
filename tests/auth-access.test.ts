@@ -57,8 +57,8 @@ describe("role model", () => {
   it("allowlist self-registration roles only", () => {
     expect(isSignupRole("CUSTOMER")).toBe(true);
     expect(isSignupRole("MESS_OWNER")).toBe(true);
+    expect(isSignupRole("MESS_STAFF")).toBe(true);
     expect(isSignupRole("DELIVERY_AGENT")).toBe(true);
-    expect(isSignupRole("MESS_STAFF")).toBe(false);
     expect(isSignupRole("PLATFORM_ADMIN")).toBe(false);
     expect(isSignupRole("ADMIN")).toBe(false);
   });
@@ -91,8 +91,8 @@ describe("auth validation", () => {
   });
 
   it("rejects privileged roles, bad email, short passwords, bad phones", () => {
-    expect(signUpSchema.safeParse({ ...validSignup, role: "MESS_STAFF" }).success).toBe(false);
     expect(signUpSchema.safeParse({ ...validSignup, role: "PLATFORM_ADMIN" }).success).toBe(false);
+    expect(signUpSchema.safeParse({ ...validSignup, role: "MESS_STAFF" }).success).toBe(true);
     expect(signUpSchema.safeParse({ ...validSignup, email: "not-an-email" }).success).toBe(false);
     expect(signUpSchema.safeParse({ ...validSignup, password: "short" }).success).toBe(false);
     expect(signUpSchema.safeParse({ ...validSignup, phone: "123" }).success).toBe(false);

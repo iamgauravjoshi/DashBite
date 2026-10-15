@@ -12,10 +12,13 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 export const UserStatusSchema = z.enum(["ACTIVE", "INACTIVE", "SUSPENDED", "UNVERIFIED"]);
 export type UserStatus = z.infer<typeof UserStatusSchema>;
 
-/** Roles a person may self-select at public sign-up. Staff are invited by owners (Phase 3); admins are seeded. */
+/** Roles a person may self-select at public sign-up. Staff join freely but can do
+ * nothing until a mess owner assigns them (assignment-scoped access). Only
+ * PLATFORM_ADMIN is seeded. */
 export const SIGNUP_ROLES = [
   "CUSTOMER",
   "MESS_OWNER",
+  "MESS_STAFF",
   "DELIVERY_AGENT"
 ] as const satisfies readonly UserRole[];
 export type SignupRole = (typeof SIGNUP_ROLES)[number];

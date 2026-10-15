@@ -96,10 +96,7 @@ export const auth = betterAuth({
           }
           if (!isSignupRole(role)) {
             throw new APIError("FORBIDDEN", {
-              message:
-                role === "MESS_STAFF"
-                  ? "Staff accounts are created by mess owners. Ask your owner for an invite."
-                  : "This role cannot self-register."
+              message: "This role cannot self-register. Platform admins are seeded by the operator."
             });
           }
           return { data: { ...user, role, status: "UNVERIFIED" } };
