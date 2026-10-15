@@ -2,7 +2,7 @@
 
 Status markers: Not Started | In Progress | Blocked | Complete | Complete with Known Limitations.
 
-- [x] PHASE 0 — Discovery, decisions, init → In Progress (this phase). Exit: repo init, stack approved, docs baseline, runnable shell + DB, baseline checks green.
+- [x] PHASE 0 — Discovery, decisions, init → Complete (see `docs/phase-reports/phase-0.md`).
 - [ ] PHASE 1 — Foundation, design system, app shell → Not Started. Prereq: Phase 0 complete.
 - [ ] PHASE 2 — Auth, profiles, roles, permissions → Not Started.
 - [ ] PHASE 3 — Mess onboarding, verification, discovery → Not Started.
