@@ -40,6 +40,13 @@ Integration suites use isolated databases on the same Postgres container (`smart
 - Prices are whole paise (₹1–₹10,000). Photos are pasted image URLs; uploads are out of MVP.
 - Customers see date strips + slot tabs with INR prices, cutoff notes, and honest closed reasons. Ordering enforcement arrives in Phase 5.
 
+## Subscription runbook (Phase 6)
+
+- Plans live per mess + slot (`/owner/subscribers` → plans). Deactivating stops new sales; sold terms never change.
+- Policy to disclose: skips keep balance until expiry (before cutoff); pauses start tomorrow and extend validity; cancels forfeit without refund; renewals chain after expiry.
+- Admin adjustments (`POST /api/admin/subscriptions/[id]/adjust`): EXTEND_VALIDITY / ADD_MEALS with mandatory reason — every adjustment is audited.
+- Expiry reminders surface in-app (expiring-soon flags); email/push reminders arrive with Phase 9 notifications.
+
 ## Backups / recovery / monitoring
 
 - Pilot (P11): documented backup (pg_dump schedule), recovery drill, log retention, uptime check. Not configured in Phase 0 beyond Docker volume `smartmess-pgdata`.

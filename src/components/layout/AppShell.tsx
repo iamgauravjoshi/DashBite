@@ -15,7 +15,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/components/ui/sheet";
-import { getNavForRole, type RoleKey, type RoleNav } from "@/config/navigation";
+import { getNavForRole, staffNavItems, type RoleKey, type RoleNav } from "@/config/navigation";
 import type { SessionUser } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 
@@ -70,7 +70,13 @@ export function AppShell({
   user: SessionUser;
   children: React.ReactNode;
 }) {
-  const nav: RoleNav = getNavForRole(role);
+  const fullNav: RoleNav = getNavForRole(role);
+  // Staff see only assigned sections. Hiding is UX, not enforcement (BR-10):
+  // every page and API still checks server-side.
+  const nav: RoleNav =
+    roleLabel === "Staff"
+      ? { ...fullNav, items: fullNav.items.filter((i) => staffNavItems.includes(i.href)) }
+      : fullNav;
   const pathname = usePathname();
   const bottomItems = nav.items.slice(0, 4);
   const hasMore = nav.items.length > 4;

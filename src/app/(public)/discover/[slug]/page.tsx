@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/data/PageHeader";
 import { MessMenuSection } from "@/components/mess/MessMenuSection";
+import { PlansTeaser } from "@/components/mess/PlansTeaser";
 import { getPublicMess } from "@/lib/messes";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -113,6 +114,7 @@ export default async function MessProfilePage({
       <div>
         <Button render={<Link href={orderHref} />}>Order from this kitchen</Button>
       </div>
+      <PlansTeaser messId={mess.id} slug={slug} />
       <Card>
         <CardHeader>
           <CardTitle>How payment works here</CardTitle>

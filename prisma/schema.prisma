@@ -39,6 +39,7 @@ model User {
   ownedMesses   Mess[]      @relation("MessOwner")
   staffAt       MessStaff[] @relation("MessStaffMember")
   orders        Order[]     @relation("OrderCustomer")
+  subscriptions Subscription[]
 
   @@unique([email])
   @@map("user")
@@ -162,6 +163,8 @@ model Mess {
   holidays           Holiday[]
   slotDays           SlotDay[]
   orders             Order[]
+  plans              SubscriptionPlan[]
+  subscriptions      Subscription[]
 
   @@index([ownerId])
   @@index([city])
@@ -210,6 +213,7 @@ model MenuSlot {
   weekly     WeeklyMenu[]
   dateMenus  DateMenu[]
   slotDays   SlotDay[]
+  plans      SubscriptionPlan[]
 
   @@unique([messId, key])
   @@index([messId])
@@ -381,8 +385,10 @@ model OrderItem {
 
 model Payment {
   id              String   @id @default(cuid())
-  orderId         String
-  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId         String?
+  order           Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  subscriptionId  String?  @unique
+  subscription    Subscription? @relation("SubscriptionPayment", fields: [subscriptionId], references: [id], onDelete: Cascade)
   provider        String   @default("MOCK")
   providerOrderId String   @unique
   providerPaymentId String?
@@ -421,4 +427,97 @@ model ProcessedWebhook {
   receivedAt DateTime @default(now())
 
   @@map("processed_webhook")
+}
+
+model SubscriptionPlan {
+  id           String   @id @default(cuid())
+  messId       String
+  mess         Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  slotId       String
+  slot         MenuSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  mealsTotal   Int
+  validityDays Int
+  pricePaise   Int
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  subscriptions Subscription[]
+
+  @@index([messId])
+  @@map("subscription_plan")
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  messId        String
+  mess          Mess     @relation(fields: [messId], references: [id], onDelete: Restrict)
+  customerId    String
+  customer      User     @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  planId        String
+  plan          SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  slotId        String
+  planName      String
+  mealsTotal    Int
+  validityDays  Int
+  pricePaise    Int
+  status        String   @default("PENDING_PAYMENT")
+  startDate     DateTime @db.Date
+  endDate       DateTime @db.Date
+  cancelReason  String?
+  cancelledAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  skips         SubscriptionSkip[]
+  pauses        SubscriptionPause[]
+  adjustments   SubscriptionAdjustment[]
+  payment       Payment? @relation("SubscriptionPayment")
+
+  @@index([customerId])
+  @@index([messId])
+  @@index([status])
+  @@map("subscription")
+}
+
+model SubscriptionSkip {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  serviceDate    DateTime     @db.Date
+  reason         String?
+  createdAt      DateTime     @default(now())
+
+  @@unique([subscriptionId, serviceDate])
+  @@index([subscriptionId])
+  @@map("subscription_skip")
+}
+
+model SubscriptionPause {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  startDate      DateTime     @db.Date
+  endDate        DateTime?    @db.Date
+  extensionDays  Int          @default(0)
+  createdAt      DateTime     @default(now())
+  resumedAt      DateTime?
+
+  @@index([subscriptionId])
+  @@map("subscription_pause")
+}
+
+model SubscriptionAdjustment {
+  id             String       @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  actorId        String
+  kind           String
+  daysDelta      Int?
+  mealsDelta     Int?
+  reason         String
+  createdAt      DateTime     @default(now())
+
+  @@index([subscriptionId])
+  @@map("subscription_adjustment")
 }

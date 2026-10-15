@@ -289,11 +289,11 @@ export interface SuccessWebhook {
 export async function handlePaymentSuccess(
   input: SuccessWebhook
 ): Promise<
-  | { outcome: "CONFIRMED"; orderId: string }
+  | { outcome: "CONFIRMED"; orderId?: string; subscriptionId?: string }
   | { outcome: "SOLD_OUT"; orderId: string }
   | { outcome: "DUPLICATE" }
   | { outcome: "UNKNOWN_ORDER" }
-  | { outcome: "ALREADY_SETTLED"; orderId: string }
+  | { outcome: "ALREADY_SETTLED"; orderId?: string; subscriptionId?: string }
 > {
   if (await claimWebhookEvent(input.provider, input.eventId)) return { outcome: "DUPLICATE" };
   const payment = await db.payment.findUnique({
@@ -301,14 +301,16 @@ export async function handlePaymentSuccess(
     include: { order: { include: { items: true } } }
   });
   if (!payment) return { outcome: "UNKNOWN_ORDER" };
-  if (payment.status === "CAPTURED")
-    return { outcome: "ALREADY_SETTLED", orderId: payment.orderId };
-  if (payment.status !== "CREATED" && payment.status !== "AUTHORIZED") {
-    return { outcome: "ALREADY_SETTLED", orderId: payment.orderId };
+  if (payment.subscriptionId) {
+    return handleSubscriptionPaymentSuccess(payment.id, payment.subscriptionId, payment, input);
   }
   const order = payment.order;
+  if (!order) return { outcome: "UNKNOWN_ORDER" };
+  if (payment.status !== "CREATED" && payment.status !== "AUTHORIZED") {
+    return { outcome: "ALREADY_SETTLED", orderId: order.id };
+  }
   if (order.status !== "PENDING_PAYMENT") {
-    return { outcome: "ALREADY_SETTLED", orderId: payment.orderId };
+    return { outcome: "ALREADY_SETTLED", orderId: order.id };
   }
   if (input.amountPaise !== payment.amountPaise) {
     await db.$transaction(async (tx) => {
@@ -318,7 +320,7 @@ export async function handlePaymentSuccess(
         data: { status: "CANCELLED", cancelReason: "PAYMENT_MISMATCH", cancelledAt: new Date() }
       });
     });
-    return { outcome: "ALREADY_SETTLED", orderId: payment.orderId };
+    return { outcome: "ALREADY_SETTLED", orderId: order.id };
   }
   const totalQty = order.items.reduce((n, i) => n + i.qty, 0);
   const dateStr = order.serviceDate.toISOString().slice(0, 10);
@@ -350,7 +352,7 @@ export async function handlePaymentSuccess(
         }
       });
     });
-    return { outcome: "SOLD_OUT", orderId: payment.orderId };
+    return { outcome: "SOLD_OUT", orderId: order.id };
   }
   await db.$transaction(async (tx) => {
     await tx.payment.update({
@@ -366,7 +368,38 @@ export async function handlePaymentSuccess(
       data: { status: "CONFIRMED", confirmedAt: new Date() }
     });
   });
-  return { outcome: "CONFIRMED", orderId: payment.orderId };
+  return { outcome: "CONFIRMED", orderId: order.id };
+}
+
+async function handleSubscriptionPaymentSuccess(
+  paymentId: string,
+  subscriptionId: string,
+  payment: { status: string; amountPaise: number },
+  input: SuccessWebhook
+): Promise<
+  | { outcome: "CONFIRMED"; subscriptionId: string }
+  | { outcome: "DUPLICATE" }
+  | { outcome: "ALREADY_SETTLED"; subscriptionId: string }
+> {
+  if (payment.status !== "CREATED" && payment.status !== "AUTHORIZED") {
+    return { outcome: "ALREADY_SETTLED", subscriptionId };
+  }
+  if (input.amountPaise !== payment.amountPaise) {
+    await db.payment.update({ where: { id: paymentId }, data: { status: "FAILED" } });
+    await db.subscription.update({
+      where: { id: subscriptionId },
+      data: { status: "CANCELLED", cancelReason: "PAYMENT_MISMATCH", cancelledAt: new Date() }
+    });
+    return { outcome: "ALREADY_SETTLED", subscriptionId };
+  }
+  await db.$transaction(async (tx) => {
+    await tx.payment.update({
+      where: { id: paymentId },
+      data: { status: "CAPTURED", providerPaymentId: input.providerPaymentId }
+    });
+    await tx.subscription.update({ where: { id: subscriptionId }, data: { status: "ACTIVE" } });
+  });
+  return { outcome: "CONFIRMED", subscriptionId };
 }
 
 export async function handlePaymentFailure(input: {
@@ -376,6 +409,7 @@ export async function handlePaymentFailure(input: {
 }): Promise<{
   outcome: "FAILED" | "DUPLICATE" | "UNKNOWN_ORDER" | "ALREADY_SETTLED";
   orderId?: string;
+  subscriptionId?: string;
 }> {
   if (await claimWebhookEvent(input.provider, input.eventId)) return { outcome: "DUPLICATE" };
   const payment = await db.payment.findUnique({
@@ -384,10 +418,18 @@ export async function handlePaymentFailure(input: {
   });
   if (!payment) return { outcome: "UNKNOWN_ORDER" };
   if (payment.status !== "CREATED" && payment.status !== "AUTHORIZED") {
-    return { outcome: "ALREADY_SETTLED", orderId: payment.orderId };
+    return {
+      outcome: "ALREADY_SETTLED",
+      ...(payment.orderId ? { orderId: payment.orderId } : {}),
+      ...(payment.subscriptionId ? { subscriptionId: payment.subscriptionId } : {})
+    };
   }
   await db.payment.update({ where: { id: payment.id }, data: { status: "FAILED" } });
-  return { outcome: "FAILED", orderId: payment.orderId };
+  return {
+    outcome: "FAILED",
+    ...(payment.orderId ? { orderId: payment.orderId } : {}),
+    ...(payment.subscriptionId ? { subscriptionId: payment.subscriptionId } : {})
+  };
 }
 
 export async function cancelOrder(

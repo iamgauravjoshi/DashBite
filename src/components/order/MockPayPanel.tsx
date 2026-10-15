@@ -12,8 +12,10 @@ export function MockPayPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order") ?? "";
+  const subscriptionId = searchParams.get("subscription") ?? "";
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<"capture" | "fail" | null>(null);
+  const doneHref = orderId ? `/app/orders/${orderId}` : `/app/subscriptions/${subscriptionId}`;
 
   async function act(action: "capture" | "fail") {
     setError(null);
@@ -21,7 +23,11 @@ export function MockPayPanel() {
     const res = await fetch("/api/payments/mock", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ orderId, action })
+      body: JSON.stringify({
+        orderId: orderId || undefined,
+        subscriptionId: subscriptionId || undefined,
+        action
+      })
     });
     const body = (await res.json().catch(() => null)) as { outcome?: string } | null;
     setPending(null);
@@ -30,13 +36,13 @@ export function MockPayPanel() {
       return;
     }
     if (body?.outcome === "SOLD_OUT") {
-      router.push(`/app/orders/${orderId}?notice=soldout`);
+      router.push(orderId ? `/app/orders/${orderId}?notice=soldout` : "/app/subscriptions");
       return;
     }
-    router.push(`/app/orders/${orderId}`);
+    router.push(doneHref);
   }
 
-  if (!orderId) {
+  if (!orderId && !subscriptionId) {
     return (
       <Alert variant="destructive">
         <AlertTitle>Order missing</AlertTitle>
@@ -69,8 +75,8 @@ export function MockPayPanel() {
           {pending === "fail" && <Spinner data-icon="inline-start" />}
           Simulate failed payment
         </Button>
-        <Button variant="ghost" render={<Link href={`/app/orders/${orderId}`} />}>
-          Skip to order status
+        <Button variant="ghost" render={<Link href={doneHref} />}>
+          Skip to status
         </Button>
       </CardContent>
     </Card>
