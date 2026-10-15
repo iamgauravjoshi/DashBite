@@ -32,7 +32,8 @@ export async function GET(
     include: {
       customer: { select: { name: true } },
       items: true,
-      payments: { orderBy: { createdAt: "desc" }, take: 1 }
+      payments: { orderBy: { createdAt: "desc" }, take: 1 },
+      fulfillmentRecord: { select: { status: true } }
     },
     orderBy: { createdAt: "desc" },
     take: 200

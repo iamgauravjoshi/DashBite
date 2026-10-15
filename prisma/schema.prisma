@@ -40,6 +40,7 @@ model User {
   staffAt       MessStaff[] @relation("MessStaffMember")
   orders        Order[]     @relation("OrderCustomer")
   subscriptions Subscription[]
+  assignedTasks Fulfillment[] @relation("FulfillmentAssignee")
 
   @@unique([email])
   @@map("user")
@@ -166,6 +167,7 @@ model Mess {
   plans              SubscriptionPlan[]
   subscriptions      Subscription[]
   sheets             KitchenSheet[]
+  fulfillments       Fulfillment[]
 
   @@index([ownerId])
   @@index([city])
@@ -397,6 +399,7 @@ model Order {
   updatedAt      DateTime @updatedAt
   items          OrderItem[]
   payments       Payment[]
+  fulfillmentRecord Fulfillment?
 
   @@index([customerId])
   @@index([messId])
@@ -462,6 +465,44 @@ model ProcessedWebhook {
   receivedAt DateTime @default(now())
 
   @@map("processed_webhook")
+}
+
+model Fulfillment {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  messId        String
+  mess          Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  method        String   @default("PICKUP")
+  status        String   @default("PENDING")
+  assigneeType  String?
+  assigneeId    String?
+  assignee      User?    @relation("FulfillmentAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  readyAt       DateTime?
+  assignedAt    DateTime?
+  dispatchedAt  DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  attempts      FulfillmentAttempt[]
+
+  @@index([messId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("fulfillment")
+}
+
+model FulfillmentAttempt {
+  id            String      @id @default(cuid())
+  fulfillmentId String
+  fulfillment   Fulfillment @relation(fields: [fulfillmentId], references: [id], onDelete: Cascade)
+  actorId       String
+  action        String
+  reason        String?
+  createdAt     DateTime    @default(now())
+
+  @@index([fulfillmentId])
+  @@map("fulfillment_attempt")
 }
 
 model SubscriptionPlan {

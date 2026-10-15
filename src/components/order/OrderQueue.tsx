@@ -34,6 +34,7 @@ interface QueueOrder {
   customer: { name: string };
   items: Array<{ id: string; name: string; qty: number; pricePaise: number }>;
   payments: Array<{ status: string }>;
+  fulfillmentRecord: { status: string } | null;
 }
 
 export function OrderQueue({
@@ -185,6 +186,11 @@ export function OrderQueue({
                 <div className="flex flex-wrap items-center gap-2">
                   {order.payments[0] && (
                     <Badge variant="outline">{order.payments[0].status.toLowerCase()}</Badge>
+                  )}
+                  {order.fulfillmentRecord && (
+                    <Badge variant="secondary">
+                      {order.fulfillmentRecord.status.toLowerCase().replace(/_/g, " ")}
+                    </Badge>
                   )}
                   {order.cancelReason && (
                     <Badge variant="outline">

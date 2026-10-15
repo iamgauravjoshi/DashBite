@@ -24,7 +24,12 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 - REQ-O06 One-time order mgmt | P5 | `/owner/orders` queue (filters, detail, reasoned cancel), staff-shared, owner/admin cancel APIs | integration cancel/isolation tests | Complete
 - REQ-O07 Subscriber/subscription mgmt | P6 | `/owner/subscribers` (plans manager, states, demand counts, per-sub schedule/audit), staff sees nothing (PII) | integration counts/isolation | Complete
 - REQ-O08 Daily counts + prep lists | P7 | `/owner/kitchen` (prep sheet, packing, pending, exceptions, late changes, finalize, adjustments) + `buildSheet` service | `tests/integration/kitchen-ops.test.ts` (5) + e2e render | Complete
-- REQ-O09 Self + agent delivery assignment | P8 | — | — | Not Started
+- REQ-O09 Self + agent delivery assignment | P8 | `/owner/deliveries` buckets, assign/reassign, handover confirms, failure log; agent task lists | `tests/integration/fulfillment.test.ts` + e2e | Complete
+- REQ-D01 Task list | P8 | `/delivery` active tasks, `/delivery/history` completions | same | Complete
+- REQ-D02 Pickup/delivery status | P8 | READY/ASSIGNED/DISPATCHED/PICKED_UP/DELIVERED transitions | transition matrix unit + integration | Complete
+- REQ-D03 Address + instructions (scoped) | P8 | agent sees address only for own stops; strangers see empty | isolation test | Complete
+- REQ-D04 Failed-delivery recording | P8 | reason-coded attempts, parcel stays actionable, 2-strike review flag | integration | Complete
+- REQ-D05 Completion records | P8 | terminal handovers + history, reconciled to orders | reconciliation test | Complete
 - REQ-O10 Revenue/order reports (basic) | P10 | — | — | Not Started
 
 ## Delivery

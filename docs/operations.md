@@ -54,6 +54,13 @@ Integration suites use isolated databases on the same Postgres container (`smart
 - Finalize when the count is locked; late confirmations, cancels, and adjustments appear under late changes with timestamps.
 - Subscriber demand comes from the same entitlement engine as customer screens — skips and pauses move both sides together.
 
+## Fulfillment runbook (Phase 8)
+
+- Every confirmed order opens a PENDING parcel. Kitchen marks READY; pickup hands over directly, delivery assigns self/staff/agent by account email.
+- Agents work their task list only — addresses appear solely for assigned stops. Failed attempts need a reason code and keep the parcel actionable; two failures flag owner review.
+- Terminal handover (picked up / delivered) reconciles the order to COMPLETED without touching money or capacity. Unfulfillable parcels cancel through the normal refund path.
+- No OTP proof-of-delivery in MVP (never in approved scope); the actor-stamped attempt log + Phase 9 issue reporting is the backstop.
+
 ## Backups / recovery / monitoring
 
 - Pilot (P11): documented backup (pg_dump schedule), recovery drill, log retention, uptime check. Not configured in Phase 0 beyond Docker volume `smartmess-pgdata`.

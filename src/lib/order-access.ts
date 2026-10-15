@@ -7,7 +7,8 @@ export async function visibleOrder(userId: string, role: string, orderId: string
     include: {
       mess: { select: { id: true, name: true, slug: true, ownerId: true } },
       items: true,
-      payments: { orderBy: { createdAt: "desc" }, include: { refunds: true } }
+      payments: { orderBy: { createdAt: "desc" }, include: { refunds: true } },
+      fulfillmentRecord: { include: { attempts: { orderBy: { createdAt: "asc" } } } }
     }
   });
   if (!order) return null;

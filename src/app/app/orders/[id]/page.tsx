@@ -59,10 +59,33 @@ export default async function CustomerOrderDetailPage({
       <div className="flex flex-wrap gap-2">
         <StatusBadge status={order.status} />
         {payment && <Badge variant="outline">payment {payment.status.toLowerCase()}</Badge>}
+        {order.fulfillmentRecord && (
+          <Badge variant="secondary">
+            {order.fulfillment === "DELIVERY" ? "delivery" : "pickup"} ·{" "}
+            {order.fulfillmentRecord.status.toLowerCase().replace(/_/g, " ")}
+          </Badge>
+        )}
         {order.cancelReason && (
           <Badge variant="outline">{order.cancelReason.toLowerCase().replace(/_/g, " ")}</Badge>
         )}
       </div>
+      {order.fulfillmentRecord && order.fulfillmentRecord.attempts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Handover timeline</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="flex flex-col gap-1.5 text-sm">
+              {order.fulfillmentRecord.attempts.map((attempt) => (
+                <li key={attempt.id} className="flex flex-wrap gap-2 text-muted-foreground">
+                  <StatusBadge status={attempt.action} />
+                  {attempt.reason && <span>{attempt.reason.toLowerCase().replace(/_/g, " ")}</span>}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Items</CardTitle>

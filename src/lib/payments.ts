@@ -4,6 +4,7 @@ import { toDbDate, todayInTz } from "@/lib/ist";
 import { getMenuForDate } from "@/lib/menus";
 import { releaseReservation, tryReserve } from "@/lib/capacity";
 import { cancellableByCustomer } from "@/lib/payment-rules";
+import { ensureFulfillment } from "@/lib/fulfillment";
 
 export {
   cancellableByCustomer,
@@ -368,6 +369,8 @@ export async function handlePaymentSuccess(
       data: { status: "CONFIRMED", confirmedAt: new Date() }
     });
   });
+  // Every confirmed order gets a traceable fulfillment path (Phase 8).
+  await ensureFulfillment(order.id);
   return { outcome: "CONFIRMED", orderId: order.id };
 }
 

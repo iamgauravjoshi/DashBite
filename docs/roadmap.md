@@ -10,7 +10,7 @@ Status markers: Not Started | In Progress | Blocked | Complete | Complete with K
 - [x] PHASE 5 — One-time ordering, checkout, payments (Razorpay sandbox), history → Complete (see `docs/phase-reports/phase-5.md`).
 - [x] PHASE 6 — Subscription plans + recurring lifecycle (business-critical) → Complete (see `docs/phase-reports/phase-6.md`).
 - [x] PHASE 7 — Kitchen ops + production planning → Complete (see `docs/phase-reports/phase-7.md`).
-- [ ] PHASE 8 — Fulfillment, delivery, pickup → Not Started. No live GPS/route opt in MVP.
+- [x] PHASE 8 — Fulfillment, delivery, pickup → Complete (see `docs/phase-reports/phase-8.md`). No live GPS/route opt in MVP.
 - [ ] PHASE 9 — Notifications, support, exceptions → Not Started.
 - [ ] PHASE 10 — SaaS admin, monetization, financial reporting → Not Started. No payouts/accounting automation in MVP.
 - [ ] PHASE 11 — Security, QA, readiness, pilot launch → Not Started. Deploy only on explicit authorization.
