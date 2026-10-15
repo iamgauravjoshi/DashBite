@@ -23,7 +23,7 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 - REQ-O05 Capacity limits | P4 | weekly/date capacity, `SlotDay` ledger, atomic `tryReserve`, edit flooring | 20-way concurrency test | Complete
 - REQ-O06 One-time order mgmt | P5 | `/owner/orders` queue (filters, detail, reasoned cancel), staff-shared, owner/admin cancel APIs | integration cancel/isolation tests | Complete
 - REQ-O07 Subscriber/subscription mgmt | P6 | `/owner/subscribers` (plans manager, states, demand counts, per-sub schedule/audit), staff sees nothing (PII) | integration counts/isolation | Complete
-- REQ-O08 Daily counts + prep lists | P7 | — | — | Not Started
+- REQ-O08 Daily counts + prep lists | P7 | `/owner/kitchen` (prep sheet, packing, pending, exceptions, late changes, finalize, adjustments) + `buildSheet` service | `tests/integration/kitchen-ops.test.ts` (5) + e2e render | Complete
 - REQ-O09 Self + agent delivery assignment | P8 | — | — | Not Started
 - REQ-O10 Revenue/order reports (basic) | P10 | — | — | Not Started
 

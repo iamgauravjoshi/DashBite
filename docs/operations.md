@@ -47,6 +47,13 @@ Integration suites use isolated databases on the same Postgres container (`smart
 - Admin adjustments (`POST /api/admin/subscriptions/[id]/adjust`): EXTEND_VALIDITY / ADD_MEALS with mandatory reason — every adjustment is audited.
 - Expiry reminders surface in-app (expiring-soon flags); email/push reminders arrive with Phase 9 notifications.
 
+## Kitchen runbook (Phase 7)
+
+- Open `/owner/kitchen`, pick mess + date + slot. Prep sheet = confirmed one-time items (with veg split) + subscriber headcount + audited adjustments.
+- Pending payments never count. Cancelled orders show under exceptions with reasons.
+- Finalize when the count is locked; late confirmations, cancels, and adjustments appear under late changes with timestamps.
+- Subscriber demand comes from the same entitlement engine as customer screens — skips and pauses move both sides together.
+
 ## Backups / recovery / monitoring
 
 - Pilot (P11): documented backup (pg_dump schedule), recovery drill, log retention, uptime check. Not configured in Phase 0 beyond Docker volume `smartmess-pgdata`.

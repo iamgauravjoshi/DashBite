@@ -165,6 +165,7 @@ model Mess {
   orders             Order[]
   plans              SubscriptionPlan[]
   subscriptions      Subscription[]
+  sheets             KitchenSheet[]
 
   @@index([ownerId])
   @@index([city])
@@ -199,6 +200,39 @@ model MessVerificationEvent {
   @@map("mess_verification_event")
 }
 
+model KitchenSheet {
+  id          String    @id @default(cuid())
+  messId      String
+  mess        Mess      @relation(fields: [messId], references: [id], onDelete: Cascade)
+  slotId      String
+  slot        MenuSlot  @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  date        DateTime  @db.Date
+  status      String    @default("OPEN")
+  finalizedAt DateTime?
+  finalizedBy String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  adjustments KitchenAdjustment[]
+
+  @@unique([messId, slotId, date])
+  @@index([messId, date])
+  @@map("kitchen_sheet")
+}
+
+model KitchenAdjustment {
+  id        String       @id @default(cuid())
+  sheetId   String
+  sheet     KitchenSheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
+  actorId   String
+  itemLabel String
+  qtyDelta  Int
+  reason    String
+  createdAt DateTime     @default(now())
+
+  @@index([sheetId])
+  @@map("kitchen_adjustment")
+}
+
 model MenuSlot {
   id         String   @id @default(cuid())
   messId     String
@@ -214,6 +248,7 @@ model MenuSlot {
   dateMenus  DateMenu[]
   slotDays   SlotDay[]
   plans      SubscriptionPlan[]
+  sheets     KitchenSheet[]
 
   @@unique([messId, key])
   @@index([messId])
