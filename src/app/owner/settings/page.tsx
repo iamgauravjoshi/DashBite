@@ -1,8 +1,10 @@
 import { ShellPlaceholder } from "@/components/data/ShellPlaceholder";
+import { requirePageAccess } from "@/lib/auth-guards";
 
 export const metadata = { title: "Settings" };
 
-export default function OwnerSettingsPage() {
+export default async function OwnerSettingsPage() {
+  await requirePageAccess("/owner/settings");
   return (
     <ShellPlaceholder
       eyebrow="Owner · Settings"

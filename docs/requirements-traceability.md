@@ -4,8 +4,8 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 
 ## Customer
 
-- REQ-C01 Registration/sign-in | P2 | — | — | Not Started
-- REQ-C02 Profile + addresses | P2 | — | — | Not Started
+- REQ-C01 Registration/sign-in | P2 | better-auth email+password, `/sign-up`, `/sign-in`, `/verify-email`, `/forgot-password`, `/reset-password` | `tests/integration/auth-flow.test.ts` (10), `auth-access.test.ts` | Complete
+- REQ-C02 Profile + addresses | P2 | `/api/profile`, `/api/addresses*`, `/app/profile`, `/app/addresses`, per-role profiles | integration ownership/status tests, validation tests | Complete
 - REQ-C03 Discovery + profiles | P3 | — | — | Not Started
 - REQ-C04 Menu/pricing visibility | P4 | — | — | Not Started
 - REQ-C05 One-time orders | P5 | — | — | Not Started

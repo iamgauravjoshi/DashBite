@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowRight, Menu } from "lucide-react";
 import { AppLogo } from "@/components/brand/AppLogo";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -14,6 +15,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet";
 import { publicNav } from "@/config/navigation";
+import type { SessionUser } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname: string, href: string): boolean {
@@ -21,7 +23,13 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function PublicShell({ children }: { children: React.ReactNode }) {
+export function PublicShell({
+  children,
+  user
+}: {
+  children: React.ReactNode;
+  user?: SessionUser | null;
+}) {
   const pathname = usePathname();
 
   return (
@@ -53,13 +61,19 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="outline" size="sm" render={<Link href="/discover" />}>
-              Find a mess
-            </Button>
-            <Button size="sm" render={<Link href="/for-owners" />}>
-              For owners
-              <ArrowRight data-icon="inline-end" />
-            </Button>
+            {user ? (
+              <UserMenu user={user} />
+            ) : (
+              <>
+                <Button variant="outline" size="sm" render={<Link href="/sign-in" />}>
+                  Sign in
+                </Button>
+                <Button size="sm" render={<Link href="/for-owners" />}>
+                  For owners
+                  <ArrowRight data-icon="inline-end" />
+                </Button>
+              </>
+            )}
           </div>
           <div className="md:hidden">
             <Sheet>
@@ -96,6 +110,15 @@ export function PublicShell({ children }: { children: React.ReactNode }) {
                     </Link>
                   ))}
                 </nav>
+                <div className="mt-auto border-t p-4">
+                  {user ? (
+                    <UserMenu user={user} />
+                  ) : (
+                    <Button className="w-full" render={<Link href="/sign-in" />}>
+                      Sign in
+                    </Button>
+                  )}
+                </div>
               </SheetContent>
             </Sheet>
           </div>

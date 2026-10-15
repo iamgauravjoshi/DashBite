@@ -16,6 +16,8 @@ Per spec §8: happy + unhappy flows, invalid input, missing records, unauthorize
 
 Phase 0 verifies only: install reproduces, lint/type/test/build pass, DB connects, `/api/health` returns 200 with DB check, docs present.
 
+Phase 2 adds: `tests/integration/auth-flow.test.ts` — full lifecycle against `smartmess_test` (signup roles, verification, sign-in, wrong-password, ban, reset, profile ownership, address cross-account isolation, suspension). Unit `tests/auth-access.test.ts` covers segment guards, redirect safety, role model, Zod schemas. Layout redirects verified by dev-server sweep (anonymous → `/sign-in`, no protected HTML leaks).
+
 ## Conventions
 
 - Unit: `*.test.ts` colocated or in `tests/unit`, Vitest.

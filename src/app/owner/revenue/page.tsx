@@ -1,8 +1,10 @@
 import { ShellPlaceholder } from "@/components/data/ShellPlaceholder";
+import { requirePageAccess } from "@/lib/auth-guards";
 
 export const metadata = { title: "Revenue" };
 
-export default function OwnerRevenuePage() {
+export default async function OwnerRevenuePage() {
+  await requirePageAccess("/owner/revenue");
   return (
     <ShellPlaceholder
       eyebrow="Owner · Revenue"

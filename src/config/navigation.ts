@@ -7,6 +7,7 @@ import {
   Info,
   LayoutDashboard,
   LifeBuoy,
+  MapPin,
   ReceiptText,
   Repeat2,
   Search,
@@ -80,6 +81,12 @@ export const customerNav: RoleNav = {
       label: "Subscriptions",
       description: "Plans, skips, pauses",
       icon: Repeat2
+    },
+    {
+      href: "/app/addresses",
+      label: "Addresses",
+      description: "Delivery addresses",
+      icon: MapPin
     },
     { href: "/app/support", label: "Support", description: "Issues and help", icon: LifeBuoy }
   ]

@@ -1,13 +1,18 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/data/PageHeader";
 import { StatusBadge } from "@/components/data/StatusBadge";
+import { requireUsableAccount } from "@/lib/auth-guards";
 import { ownerNav } from "@/config/navigation";
 
 export const metadata = { title: "Mess console" };
 
-export default function OwnerHomePage() {
+export default async function OwnerHomePage() {
+  const user = await requireUsableAccount("/owner");
+  if (user.role === "MESS_STAFF") redirect("/owner/orders");
+  if (user.role !== "MESS_OWNER") redirect("/forbidden");
   const cards = ownerNav.items.filter((item) => item.href !== "/owner");
   return (
     <div className="flex flex-col gap-6">

@@ -2,8 +2,11 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  NEXTAUTH_SECRET: z.string().min(1).optional(),
-  NEXTAUTH_URL: z.string().optional(),
+  BETTER_AUTH_SECRET: z.string().min(32, "BETTER_AUTH_SECRET must be at least 32 characters"),
+  BETTER_AUTH_URL: z
+    .string()
+    .url("BETTER_AUTH_URL must be a valid URL")
+    .default("http://localhost:3000"),
   APP_TIMEZONE: z.string().default("Asia/Kolkata"),
   APP_DEFAULT_CITY: z.string().default("Pune"),
   RAZORPAY_KEY_ID: z.string().optional(),

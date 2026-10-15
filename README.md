@@ -11,7 +11,7 @@ Hybrid marketplace + mess-owner SaaS. Core differentiator: recurring-meal lifecy
 - Tailwind CSS v4 + shadcn/ui (Phase 1), Zod validation
 - Vitest (unit) + Playwright (E2E from Phase 1)
 - Payments: Razorpay sandbox behind abstraction (from Phase 5, not installed in Phase 0)
-- Auth: email + password (Phase 2; `next-auth` selection deferred to Phase 2 spike)
+- Auth: better-auth 1.7.8 email + password (Phase 2; chosen over next-auth v5 beta — see D-11)
 - Timezone: store UTC, interpret/display `Asia/Kolkata`
 
 Why not absolute-latest TS/ESLint: TS 7.0 + ESLint 10 break `eslint-config-next@16.4.1` (peer `typescript <6.1`, `eslint ^9`). Pinned to latest compatible stable: TS 5.9.3, ESLint 9.39.5. Prisma 7.10.0 stable over 8.0.0-rc for pilot integrity. See `docs/decision-log.md`.
@@ -48,6 +48,14 @@ npm.cmd run dev
 # → http://localhost:3000
 # → http://localhost:3000/api/health  ({"status":"ok","database":{"ok":true}})
 ```
+
+First platform admin (bootstrap opens once):
+
+```powershell
+npx.cmd auth@latest create-admin --email admin@smartmess.local --name "SmartMess Admin" --role PLATFORM_ADMIN --password "<strong-pw>"
+```
+
+Sign up at `/sign-up` (Customer / Mess owner / Delivery). Verification and reset links print to the server terminal in development (no SMTP yet — production must configure one; see `docs/operations.md`).
 
 Postgres 18 note: `docker-compose.yml` mounts `smartmess-pgdata:/var/lib/postgresql`. Mounting `/var/lib/postgresql/data` makes PG18 fail to boot (see Phase 0 report). If you upgraded from a PG17 volume, `docker compose down -v` once.
 

@@ -4,7 +4,7 @@ Status markers: Not Started | In Progress | Blocked | Complete | Complete with K
 
 - [x] PHASE 0 — Discovery, decisions, init → Complete (see `docs/phase-reports/phase-0.md`).
 - [x] PHASE 1 — Foundation, design system, app shell → Complete (see `docs/phase-reports/phase-1.md`).
-- [ ] PHASE 2 — Auth, profiles, roles, permissions → Not Started.
+- [x] PHASE 2 — Auth, profiles, roles, permissions → Complete (see `docs/phase-reports/phase-2.md`).
 - [ ] PHASE 3 — Mess onboarding, verification, discovery → Not Started.
 - [ ] PHASE 4 — Menu, pricing, schedules, windows, capacity → Not Started.
 - [ ] PHASE 5 — One-time ordering, checkout, payments (Razorpay sandbox), history → Not Started.

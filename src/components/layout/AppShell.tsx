@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { AppLogo, RoleMark } from "@/components/brand/AppLogo";
+import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,6 +16,7 @@ import {
   SheetTrigger
 } from "@/components/ui/sheet";
 import { getNavForRole, type RoleKey, type RoleNav } from "@/config/navigation";
+import type { SessionUser } from "@/lib/auth-guards";
 import { cn } from "@/lib/utils";
 
 function isActive(pathname: string, href: string): boolean {
@@ -60,10 +62,12 @@ function NavLink({
 export function AppShell({
   role,
   roleLabel,
+  user,
   children
 }: {
   role: RoleKey;
   roleLabel: string;
+  user: SessionUser;
   children: React.ReactNode;
 }) {
   const nav: RoleNav = getNavForRole(role);
@@ -104,6 +108,7 @@ export function AppShell({
           </nav>
           <div className="mt-auto flex flex-col gap-2">
             <Separator />
+            <UserMenu user={user} />
             <p className="px-1 text-xs text-muted-foreground">{nav.tagline}</p>
           </div>
         </aside>
@@ -141,6 +146,9 @@ export function AppShell({
                       />
                     ))}
                   </nav>
+                  <div className="mt-auto border-t p-4">
+                    <UserMenu user={user} />
+                  </div>
                 </SheetContent>
               </Sheet>
             </div>
