@@ -8,10 +8,10 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 - REQ-C02 Profile + addresses | P2 | `/api/profile`, `/api/addresses*`, `/app/profile`, `/app/addresses`, per-role profiles | integration ownership/status tests, validation tests | Complete
 - REQ-C03 Discovery + profiles | P3 | `/discover` (city search/filters), `/discover/[slug]` (eligible-only, 404 otherwise), no ratings (no review data) | integration filter/eligibility tests, dev sweep | Complete
 - REQ-C04 Menu/pricing visibility | P4 | `/discover/[slug]` menu section (7-day strip, slot tabs, INR prices, cutoff + capacity notes) | resolution tests, dev sweep | Complete
-- REQ-C05 One-time orders | P5 | — | — | Not Started
+- REQ-C05 One-time orders | P5 | `/discover/[slug]/order` checkout, server-priced quotes, cutoff/capacity gates | integration happy-path + concurrency tests | Complete
 - REQ-C06 Subscriptions + skip/pause/resume/history | P6 | — | — | Not Started
-- REQ-C07 Checkout + payment status | P5 | — | — | Not Started
-- REQ-C08 Order history + tracking | P5 | — | — | Not Started
+- REQ-C07 Checkout + payment status | P5 | Mock sandbox + Razorpay adapter, idempotent webhooks, `/app/orders/[id]` payment/refund states | duplicate-notification + failure tests | Complete (live Razorpay pending keys)
+- REQ-C08 Order history + tracking | P5 | `/app/orders` history, detail with items/refunds/cancel | integration consistency test | Complete
 - REQ-C09 Notifications + issue reporting | P9 | — | — | Not Started
 
 ## Owner
@@ -21,7 +21,7 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 - REQ-O03 Menu + schedule mgmt | P4 | `/owner/menus` (slots/items/weekly/dates/holidays), menu APIs, snapshot semantics | `tests/integration/menu-capacity.test.ts`, `menu-rules.test.ts` | Complete
 - REQ-O04 Per-slot order windows | P4 | per-slot `cutoffTime`, `orderable` resolution, cutoff display | cutoff boundary tests | Complete
 - REQ-O05 Capacity limits | P4 | weekly/date capacity, `SlotDay` ledger, atomic `tryReserve`, edit flooring | 20-way concurrency test | Complete
-- REQ-O06 One-time order mgmt | P5 | — | — | Not Started
+- REQ-O06 One-time order mgmt | P5 | `/owner/orders` queue (filters, detail, reasoned cancel), staff-shared, owner/admin cancel APIs | integration cancel/isolation tests | Complete
 - REQ-O07 Subscriber/subscription mgmt | P6 | — | — | Not Started
 - REQ-O08 Daily counts + prep lists | P7 | — | — | Not Started
 - REQ-O09 Self + agent delivery assignment | P8 | — | — | Not Started

@@ -38,6 +38,7 @@ model User {
   addresses     Address[]
   ownedMesses   Mess[]      @relation("MessOwner")
   staffAt       MessStaff[] @relation("MessStaffMember")
+  orders        Order[]     @relation("OrderCustomer")
 
   @@unique([email])
   @@map("user")
@@ -107,6 +108,7 @@ model Address {
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 
   @@index([userId])
   @@map("address")
@@ -138,6 +140,7 @@ model Mess {
   pickupAllowed      Boolean                 @default(true)
   deliveryAllowed    Boolean                 @default(true)
   deliveryNote       String?
+  deliveryFeePaise   Int                     @default(0)
   serviceAreas       String[]                @default([])
   operatingDays      String[]                @default(["MON", "TUE", "WED", "THU", "FRI", "SAT"])
   opensAt            String                  @default("07:00")
@@ -158,6 +161,7 @@ model Mess {
   dateMenus          DateMenu[]
   holidays           Holiday[]
   slotDays           SlotDay[]
+  orders             Order[]
 
   @@index([ownerId])
   @@index([city])
@@ -327,4 +331,94 @@ model SlotDay {
   @@unique([messId, slotId, date])
   @@index([messId, date])
   @@map("slot_day")
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  messId         String
+  mess           Mess     @relation(fields: [messId], references: [id], onDelete: Restrict)
+  customerId     String
+  customer       User     @relation("OrderCustomer", fields: [customerId], references: [id], onDelete: Restrict)
+  slotId         String
+  serviceDate    DateTime @db.Date
+  fulfillment    String   @default("PICKUP")
+  status         String   @default("PENDING_PAYMENT")
+  itemTotalPaise Int
+  deliveryFeePaise Int    @default(0)
+  discountPaise  Int      @default(0)
+  taxPaise       Int      @default(0)
+  payablePaise   Int
+  addressId      String?
+  address        Address? @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  cancelReason   String?
+  expiresAt      DateTime
+  confirmedAt    DateTime?
+  cancelledAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  items          OrderItem[]
+  payments       Payment[]
+
+  @@index([customerId])
+  @@index([messId])
+  @@index([messId, serviceDate])
+  @@map("order")
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  itemId     String
+  name       String
+  pricePaise Int
+  qty        Int
+  createdAt  DateTime @default(now())
+
+  @@index([orderId])
+  @@map("order_item")
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  orderId         String
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider        String   @default("MOCK")
+  providerOrderId String   @unique
+  providerPaymentId String?
+  amountPaise     Int
+  currency        String   @default("INR")
+  status          String   @default("CREATED")
+  attempts        Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  refunds         Refund[]
+
+  @@index([orderId])
+  @@map("payment")
+}
+
+model Refund {
+  id               String   @id @default(cuid())
+  paymentId        String
+  payment          Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  amountPaise      Int
+  reason           String
+  status           String   @default("INITIATED")
+  providerRefundId String?
+  actorId          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([paymentId])
+  @@map("refund")
+}
+
+model ProcessedWebhook {
+  id         String   @id @default(cuid())
+  provider   String
+  eventId    String   @unique
+  receivedAt DateTime @default(now())
+
+  @@map("processed_webhook")
 }

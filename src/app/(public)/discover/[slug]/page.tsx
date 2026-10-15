@@ -35,6 +35,7 @@ export default async function MessProfilePage({
   const { date, slot } = await searchParams;
   const mess = await getPublicMess(slug);
   if (!mess) notFound();
+  const orderHref = date ? `/discover/${slug}/order?date=${date}` : `/discover/${slug}/order`;
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 md:px-6">
@@ -109,13 +110,16 @@ export default async function MessProfilePage({
         </Card>
       </div>
       <MessMenuSection messId={mess.id} date={date ?? ""} slotId={slot ?? null} />
+      <div>
+        <Button render={<Link href={orderHref} />}>Order from this kitchen</Button>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle>Ordering opens in Phase 5</CardTitle>
+          <CardTitle>How payment works here</CardTitle>
           <CardDescription>
-            One-time orders, subscriptions with skip and pause, and kitchen-accurate counts are
-            being built phase by phase. No ratings yet — reviews open with Phase 9 support tooling
-            and only ever reflect verified orders.
+            Pay at checkout and the kitchen confirms only if room remains — otherwise money comes
+            straight back. Cancellations before the slot cutoff refund automatically. No ratings yet
+            — reviews open with Phase 9 support tooling and only ever reflect verified orders.
           </CardDescription>
         </CardHeader>
       </Card>

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/data/PageHeader";
 import { StatusBadge } from "@/components/data/StatusBadge";
 import { EmptyBlock } from "@/components/data/StateBlock";
 import { MessEditor } from "@/components/mess/MessEditor";
+import { FulfillmentCard } from "@/components/mess/FulfillmentCard";
 import { StaffManager } from "@/components/mess/StaffManager";
 import { requirePageAccess } from "@/lib/auth-guards";
 import type { MessFormValues } from "@/components/mess/MessForm";
@@ -145,6 +146,15 @@ export default async function OwnerSettingsPage({
       <StaffManager
         messId={selected.id}
         initial={selected.staff.map((s) => ({ userId: s.userId, user: s.user }))}
+      />
+      <FulfillmentCard
+        messId={selected.id}
+        initial={{
+          deliveryFeePaise: selected.deliveryFeePaise,
+          pickupAllowed: selected.pickupAllowed,
+          deliveryAllowed: selected.deliveryAllowed,
+          deliveryNote: selected.deliveryNote
+        }}
       />
     </div>
   );

@@ -21,21 +21,25 @@ export async function ensureSlotDay(
 ): Promise<Availability | null> {
   const menu = await getMenuForDate(messId, dateStr, slotId);
   if (!menu || menu.status !== "open" || menu.capacity == null) return null;
-  const existing = await db.slotDay.findUnique({
-    where: { messId_slotId_date: { messId, slotId, date: toDbDate(dateStr) } }
+  const key = { messId_slotId_date: { messId, slotId, date: toDbDate(dateStr) } };
+  const toAvailability = (day: { id: string; capacity: number; booked: number }): Availability => ({
+    slotDayId: day.id,
+    capacity: day.capacity,
+    booked: day.booked,
+    left: Math.max(0, day.capacity - day.booked)
   });
-  if (existing) {
-    return {
-      slotDayId: existing.id,
-      capacity: existing.capacity,
-      booked: existing.booked,
-      left: Math.max(0, existing.capacity - existing.booked)
-    };
+  // Fast path first; on a concurrent first-touch race the losers re-read the winner (BR-07).
+  const existing = await db.slotDay.findUnique({ where: key });
+  if (existing) return toAvailability(existing);
+  try {
+    const created = await db.slotDay.create({
+      data: { messId, slotId, date: toDbDate(dateStr), capacity: menu.capacity, booked: 0 }
+    });
+    return toAvailability(created);
+  } catch (error) {
+    if ((error as { code?: string }).code !== "P2002") throw error;
+    return toAvailability(await db.slotDay.findUniqueOrThrow({ where: key }));
   }
-  const created = await db.slotDay.create({
-    data: { messId, slotId, date: toDbDate(dateStr), capacity: menu.capacity, booked: 0 }
-  });
-  return { slotDayId: created.id, capacity: created.capacity, booked: 0, left: created.capacity };
 }
 
 /**
