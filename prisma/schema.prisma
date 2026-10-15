@@ -152,6 +152,12 @@ model Mess {
   updatedAt          DateTime                @updatedAt
   staff              MessStaff[]
   events             MessVerificationEvent[]
+  slots              MenuSlot[]
+  items              MenuItem[]
+  weeklyMenus        WeeklyMenu[]
+  dateMenus          DateMenu[]
+  holidays           Holiday[]
+  slotDays           SlotDay[]
 
   @@index([ownerId])
   @@index([city])
@@ -184,4 +190,141 @@ model MessVerificationEvent {
 
   @@index([messId])
   @@map("mess_verification_event")
+}
+
+model MenuSlot {
+  id         String   @id @default(cuid())
+  messId     String
+  mess       Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  key        String
+  name       String
+  cutoffTime String   @default("09:00")
+  sortOrder  Int      @default(0)
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  weekly     WeeklyMenu[]
+  dateMenus  DateMenu[]
+  slotDays   SlotDay[]
+
+  @@unique([messId, key])
+  @@index([messId])
+  @@map("menu_slot")
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  messId      String
+  mess        Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  pricePaise  Int
+  vegType     String   @default("VEG")
+  photoUrl    String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  weeklyItems WeeklyMenuItem[]
+  dateItems   DateMenuItem[]
+
+  @@index([messId])
+  @@map("menu_item")
+}
+
+model WeeklyMenu {
+  id        String   @id @default(cuid())
+  messId    String
+  mess      Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  slotId    String
+  slot      MenuSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  dayOfWeek Int
+  capacity  Int
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     WeeklyMenuItem[]
+
+  @@unique([messId, slotId, dayOfWeek])
+  @@index([messId])
+  @@map("weekly_menu")
+}
+
+model WeeklyMenuItem {
+  id           String     @id @default(cuid())
+  weeklyMenuId String
+  weeklyMenu   WeeklyMenu @relation(fields: [weeklyMenuId], references: [id], onDelete: Cascade)
+  itemId       String
+  item         MenuItem   @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  pricePaise   Int
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([weeklyMenuId, itemId])
+  @@index([weeklyMenuId])
+  @@map("weekly_menu_item")
+}
+
+model DateMenu {
+  id        String   @id @default(cuid())
+  messId    String
+  mess      Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  slotId    String
+  slot      MenuSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  closed    Boolean  @default(false)
+  capacity  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  items     DateMenuItem[]
+
+  @@unique([messId, slotId, date])
+  @@index([messId, date])
+  @@map("date_menu")
+}
+
+model DateMenuItem {
+  id         String   @id @default(cuid())
+  dateMenuId String
+  dateMenu   DateMenu @relation(fields: [dateMenuId], references: [id], onDelete: Cascade)
+  itemId     String
+  item       MenuItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  pricePaise Int
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([dateMenuId, itemId])
+  @@index([dateMenuId])
+  @@map("date_menu_item")
+}
+
+model Holiday {
+  id        String   @id @default(cuid())
+  messId    String
+  mess      Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@unique([messId, date])
+  @@index([messId, date])
+  @@map("holiday")
+}
+
+model SlotDay {
+  id        String   @id @default(cuid())
+  messId    String
+  mess      Mess     @relation(fields: [messId], references: [id], onDelete: Cascade)
+  slotId    String
+  slot      MenuSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  date      DateTime @db.Date
+  capacity  Int
+  booked    Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([messId, slotId, date])
+  @@index([messId, date])
+  @@map("slot_day")
 }

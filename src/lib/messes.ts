@@ -152,3 +152,11 @@ export async function setPublished(messId: string, published: boolean) {
   }
   return db.mess.update({ where: { id: messId }, data: { published } });
 }
+
+export async function weeklyById(messId: string, weeklyId: string) {
+  const weekly = await db.weeklyMenu.findUnique({
+    where: { id: weeklyId },
+    include: { items: { include: { item: true } } }
+  });
+  return weekly && weekly.messId === messId ? weekly : null;
+}

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/data/PageHeader";
+import { MessMenuSection } from "@/components/mess/MessMenuSection";
 import { getPublicMess } from "@/lib/messes";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -23,8 +24,15 @@ const DAY_LABELS: Record<string, string> = {
   SUN: "Sunday"
 };
 
-export default async function MessProfilePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function MessProfilePage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ date?: string; slot?: string }>;
+}) {
   const { slug } = await params;
+  const { date, slot } = await searchParams;
   const mess = await getPublicMess(slug);
   if (!mess) notFound();
 
@@ -61,7 +69,7 @@ export default async function MessProfilePage({ params }: { params: Promise<{ sl
               {mess.operatingDays.map((d) => DAY_LABELS[d] ?? d).join(", ")}
             </p>
             <CardDescription className="mt-2">
-              Per-slot menus, cutoffs, and capacity arrive with Phase 4.
+              Order cutoffs are enforced at checkout from Phase 5.
             </CardDescription>
           </CardContent>
         </Card>
@@ -100,6 +108,7 @@ export default async function MessProfilePage({ params }: { params: Promise<{ sl
           </CardContent>
         </Card>
       </div>
+      <MessMenuSection messId={mess.id} date={date ?? ""} slotId={slot ?? null} />
       <Card>
         <CardHeader>
           <CardTitle>Ordering opens in Phase 5</CardTitle>

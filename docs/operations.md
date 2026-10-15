@@ -32,6 +32,14 @@ Integration suites use isolated databases on the same Postgres container (`smart
 - Publish toggle needs APPROVED. Only published + approved listings appear in `/discover`.
 - Suspended mess? Vanishes from discovery instantly; existing commitments are preserved by rule (enforced in Phase 5+ flows).
 
+## Menu runbook (Phase 4)
+
+- Slots first (`/owner/menus` → Slots; one-click Breakfast/Lunch/Dinner with 07:00/09:30/16:00 cutoffs), then Items, then Weekly plans, then date overrides and Holidays.
+- Weekly templates repeat; a saved date override snapshots items+prices+capacity and never changes when catalog/templates move. Delete the override to fall back to weekly.
+- Capacity edits propagate to future `slot_day` ledgers floored at already-booked. Past ledgers are history.
+- Prices are whole paise (₹1–₹10,000). Photos are pasted image URLs; uploads are out of MVP.
+- Customers see date strips + slot tabs with INR prices, cutoff notes, and honest closed reasons. Ordering enforcement arrives in Phase 5.
+
 ## Backups / recovery / monitoring
 
 - Pilot (P11): documented backup (pg_dump schedule), recovery drill, log retention, uptime check. Not configured in Phase 0 beyond Docker volume `smartmess-pgdata`.
