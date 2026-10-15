@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #fafaf9;
+  --bg-surface: #ffffff;
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --border-subtle: #e7e5e4;
+  --accent: #16a34a;
+  --accent-hover: #15803d;
+}
+
+body {
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}

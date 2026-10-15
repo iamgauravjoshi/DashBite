@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: smartmess-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: smartmess
+      POSTGRES_PASSWORD: smartmess_dev_pw
+      POSTGRES_DB: smartmess
+    ports:
+      - "5432:5432"
+    volumes:
+      - smartmess-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartmess -d smartmess"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  smartmess-pgdata:

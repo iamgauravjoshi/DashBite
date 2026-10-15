@@ -1,0 +1,7 @@
+node_modules
+.next
+coverage
+prisma/migrations
+DESIGN.md
+SKILLS.md
+next-env.d.ts

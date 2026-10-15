@@ -1,0 +1,21 @@
+# deps
+node_modules/
+
+# next
+.next/
+out/
+
+# env
+.env
+.env*.local
+
+# prisma
+prisma/migrations/migration_lock.toml
+
+# testing / coverage
+coverage/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
