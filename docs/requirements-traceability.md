@@ -45,7 +45,7 @@ Format: REQ-ID | Scenario | Phase | Implementation | Tests | Status.
 
 ## Foundation
 
-- REQ-F01 App shell + design system + navigation (4 roles) | P1 | — | — | Not Started
+- REQ-F01 App shell + design system + navigation (4 roles) | P1 | `src/config/navigation.ts`, `AppShell`/`PublicShell`, `(public)` + role routes, `/system` | `tests/navigation.test.ts`, `status-badge.test.ts`, 28-route 200 sweep, build | Complete
 - REQ-F02 Foundation baseline (repo, env, lint, test, build, DB) | P0 | this phase | baseline checks | In Progress
 
 Update Implementation/Tests/Status as phases complete. Business-rule coverage: BR-01…BR-18 mapped in phase test plans from P3 onward.

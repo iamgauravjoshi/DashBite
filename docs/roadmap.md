@@ -3,7 +3,7 @@
 Status markers: Not Started | In Progress | Blocked | Complete | Complete with Known Limitations.
 
 - [x] PHASE 0 — Discovery, decisions, init → Complete (see `docs/phase-reports/phase-0.md`).
-- [ ] PHASE 1 — Foundation, design system, app shell → Not Started. Prereq: Phase 0 complete.
+- [x] PHASE 1 — Foundation, design system, app shell → Complete (see `docs/phase-reports/phase-1.md`).
 - [ ] PHASE 2 — Auth, profiles, roles, permissions → Not Started.
 - [ ] PHASE 3 — Mess onboarding, verification, discovery → Not Started.
 - [ ] PHASE 4 — Menu, pricing, schedules, windows, capacity → Not Started.
